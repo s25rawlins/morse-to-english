@@ -1,0 +1,113 @@
+/* Loading Spinner Styles */
+.loading-spinner {
+  display: inline-block;
+  position: relative;
+}
+
+.spinner-ring {
+  display: inline-block;
+  position: relative;
+}
+
+.spinner-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  border-radius: 50%;
+  animation: spinner-ring-animation 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-style: solid;
+}
+
+.spinner-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+
+.spinner-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.spinner-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+/* Size variants */
+.spinner-small .spinner-ring {
+  width: 16px;
+  height: 16px;
+}
+
+.spinner-small .spinner-ring div {
+  width: 13px;
+  height: 13px;
+  margin: 1px;
+  border-width: 1px;
+}
+
+.spinner-medium .spinner-ring {
+  width: 24px;
+  height: 24px;
+}
+
+.spinner-medium .spinner-ring div {
+  width: 19px;
+  height: 19px;
+  margin: 2px;
+  border-width: 2px;
+}
+
+.spinner-large .spinner-ring {
+  width: 32px;
+  height: 32px;
+}
+
+.spinner-large .spinner-ring div {
+  width: 26px;
+  height: 26px;
+  margin: 3px;
+  border-width: 3px;
+}
+
+/* Color variants */
+.spinner-primary .spinner-ring div {
+  border-color: var(--primary-color) transparent transparent transparent;
+}
+
+.spinner-white .spinner-ring div {
+  border-color: white transparent transparent transparent;
+}
+
+.spinner-secondary .spinner-ring div {
+  border-color: var(--secondary-color) transparent transparent transparent;
+}
+
+.spinner-success .spinner-ring div {
+  border-color: var(--success-color) transparent transparent transparent;
+}
+
+.spinner-error .spinner-ring div {
+  border-color: var(--error-color) transparent transparent transparent;
+}
+
+@keyframes spinner-ring-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .spinner-ring div {
+    animation: none;
+    border-color: var(--primary-color);
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 50%;
+  }
+  
+  .spinner-ring div:not(:first-child) {
+    display: none;
+  }
+}
