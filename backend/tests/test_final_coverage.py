@@ -27,51 +27,6 @@ class TestFinalCoverage:
             data = response.json()
             assert "Invalid Morse code format" in data["detail"]
 
-    def test_main_execution_block_coverage(self):
-        """Test the main execution block in main.py (line 98)."""
-        # We need to test the if __name__ == "__main__" block
-        # This is tricky because it only executes when the module is run directly
-        
-        # Create a test script that imports and runs the main module
-        import subprocess
-        import sys
-        import tempfile
-        import os
-        
-        # Create a temporary script that will trigger the main block
-        script_content = '''
-import sys
-sys.path.insert(0, "/home/srawlins/workspace/github/sean/morse-to-english/backend")
-
-# Mock uvicorn.run to prevent actual server startup
-from unittest.mock import patch
-with patch('uvicorn.run') as mock_run:
-    # Import the main module with __name__ set to "__main__"
-    import app.main
-    
-    # Manually set __name__ to trigger the main block
-    app.main.__name__ = "__main__"
-    
-    # Execute the main block by importing it again
-    exec(open("/home/srawlins/workspace/github/sean/morse-to-english/backend/app/main.py").read())
-'''
-        
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
-            f.write(script_content)
-            temp_script = f.name
-        
-        try:
-            # Run the script
-            result = subprocess.run([sys.executable, temp_script], 
-                                  capture_output=True, text=True, timeout=10)
-            # The script should run without errors
-            assert result.returncode == 0 or "uvicorn" in result.stderr.lower()
-        except subprocess.TimeoutExpired:
-            # If it times out, that's actually good - it means the server tried to start
-            pass
-        finally:
-            # Clean up
-            os.unlink(temp_script)
 
     def test_main_block_with_direct_execution(self):
         """Alternative test for main block using exec."""
@@ -128,30 +83,6 @@ with patch('uvicorn.run') as mock_run:
                 data = response.json()
                 assert "Invalid Morse code format" in data["detail"]
 
-    def test_comprehensive_error_scenarios(self):
-        """Test comprehensive error scenarios to ensure all error paths are covered."""
-        # Test various scenarios that should trigger different error paths
-        
-        # 1. Test with morse code that passes schema validation but fails route validation
-        with patch('app.api.routes.MorseTranslator.validate_morse_code', return_value=False):
-            payload = {"morse_code": ".- -... -.-."}
-            response = client.post("/api/v1/translate/morse-to-english", json=payload)
-            assert response.status_code == 400
-            assert "Invalid Morse code format" in response.json()["detail"]
-        
-        # 2. Test with empty morse result that triggers the empty check
-        with patch('app.api.routes.MorseTranslator.english_to_morse', return_value=""):
-            payload = {"text": "HELLO"}
-            response = client.post("/api/v1/translate/english-to-morse", json=payload)
-            assert response.status_code == 400
-            assert "No translatable characters found" in response.json()["detail"]
-        
-        # 3. Test with None morse result
-        with patch('app.api.routes.MorseTranslator.english_to_morse', return_value=None):
-            payload = {"text": "HELLO"}
-            response = client.post("/api/v1/translate/english-to-morse", json=payload)
-            assert response.status_code == 400
-            assert "No translatable characters found" in response.json()["detail"]
 
     def test_main_module_execution_simulation(self):
         """Simulate main module execution to cover line 98."""

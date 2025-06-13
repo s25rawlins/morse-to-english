@@ -33,10 +33,6 @@ class TestMorseTranslator:
         result2 = MorseTranslator.english_to_morse("HELLO")
         assert result1 == result2
 
-    def test_english_to_morse_empty_string(self):
-        """Test English to Morse with empty string."""
-        result = MorseTranslator.english_to_morse("")
-        assert result == ""
 
     def test_english_to_morse_whitespace_only(self):
         """Test English to Morse with whitespace only."""

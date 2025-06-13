@@ -37,12 +37,12 @@ const Toast = ({
       case 'success':
         return '✓';
       case 'error':
-        return '✕';
+        return '✗';
       case 'warning':
-        return '⚠';
+        return '!';
       case 'info':
       default:
-        return 'ℹ';
+        return 'i';
     }
   };
 

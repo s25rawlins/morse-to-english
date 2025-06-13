@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Header Component snapshot consistency 1`] = `
+<header
+  class="header"
+>
+  <h1>
+    Morse Code Translator
+  </h1>
+  <p>
+    Convert between English text and Morse code with ease. Our intelligent translator handles ambiguous patterns and provides multiple interpretations when needed.
+  </p>
+</header>
+`;

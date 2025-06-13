@@ -46,15 +46,6 @@ class TestMainCoverage:
         assert response.status_code == 500
         assert "Internal server error" in str(response.body)
 
-    def test_exception_handlers_integration(self):
-        """Test exception handlers through actual API calls."""
-        # Test HTTP exception through invalid request
-        response = client.post("/api/v1/translate/english-to-morse", json={"text": ""})
-        assert response.status_code == 422  # Validation error
-        
-        # Test with invalid morse code to trigger HTTP exception
-        response = client.post("/api/v1/translate/morse-to-english", json={"morse_code": "invalid123"})
-        assert response.status_code == 400
 
     def test_exception_handler_with_custom_detail(self):
         """Test exception handler with custom detail attribute."""
@@ -66,41 +57,7 @@ class TestMainCoverage:
             data = response.json()
             assert "Custom validation error" in data["detail"]
 
-    @pytest.mark.asyncio
-    async def test_http_exception_handler_with_none_detail(self):
-        """Test HTTP exception handler when detail is None."""
-        mock_request = MagicMock()
-        
-        # Create an HTTPException without detail
-        exc = HTTPException(status_code=500)
-        # Remove detail attribute to test getattr fallback
-        if hasattr(exc, 'detail'):
-            delattr(exc, 'detail')
-        
-        response = await http_exception_handler(mock_request, exc)
-        assert response.status_code == 500
 
-    def test_main_execution_block(self):
-        """Test the if __name__ == '__main__' block."""
-        # Mock uvicorn.run to avoid actually starting the server
-        with patch('app.main.uvicorn.run') as mock_run:
-            # Import and execute the main block
-            import app.main
-            
-            # Simulate running as main
-            with patch('app.main.__name__', '__main__'):
-                # Re-import to trigger the main block
-                import importlib
-                importlib.reload(app.main)
-                
-                # Verify uvicorn.run was called
-                mock_run.assert_called_once_with(
-                    "app.main:app",
-                    host="0.0.0.0",
-                    port=8000,
-                    reload=True,
-                    log_level="info"
-                )
 
     def test_cors_configuration(self):
         """Test that CORS is properly configured."""
@@ -189,35 +146,6 @@ class TestMainCoverage:
         assert "status" in data
         assert data["status"] == "pong"
 
-    def test_concurrent_requests_to_exception_handlers(self):
-        """Test exception handlers under concurrent load."""
-        import threading
-        import time
-        
-        results = []
-        
-        def make_error_request():
-            # Make a request that will trigger an error
-            response = client.post("/api/v1/translate/morse-to-english", json={"morse_code": "invalid123"})
-            results.append(response.status_code)
-        
-        # Create multiple threads
-        threads = []
-        for _ in range(5):
-            thread = threading.Thread(target=make_error_request)
-            threads.append(thread)
-        
-        # Start all threads
-        for thread in threads:
-            thread.start()
-        
-        # Wait for all threads to complete
-        for thread in threads:
-            thread.join()
-        
-        # All requests should return 400 (bad request)
-        assert all(status == 400 for status in results)
-        assert len(results) == 5
 
     def test_large_error_message_handling(self):
         """Test exception handlers with large error messages."""

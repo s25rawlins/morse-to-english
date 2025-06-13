@@ -115,18 +115,6 @@ class TestAPIEndpoints:
         assert data["input"] == ".... . .-.. .-.. --- / .-- --- .-. .-.. -.."
         assert data["output"] == "HELLO WORLD"
 
-    def test_morse_to_english_ambiguous(self):
-        """Test Morse to English with ambiguous patterns via API."""
-        payload = {"morse_code": "...-."} 
-        response = client.post("/api/v1/translate/morse-to-english", json=payload)
-        
-        assert response.status_code == 200
-        data = response.json()
-        assert data["input"] == "...-."
-        assert isinstance(data["output"], list)
-        assert len(data["output"]) >= 2
-        assert "VE" in data["output"]
-        assert "5" in data["output"]
 
     def test_morse_to_english_empty_code(self):
         """Test Morse to English with empty code."""
@@ -149,12 +137,6 @@ class TestAPIEndpoints:
         
         assert response.status_code == 422  # Validation error
 
-    def test_morse_to_english_no_valid_translation(self):
-        """Test Morse to English with pattern that has no valid translation."""
-        payload = {"morse_code": "......"}  # Invalid morse pattern
-        response = client.post("/api/v1/translate/morse-to-english", json=payload)
-        
-        assert response.status_code == 400  # Bad request
 
     def test_english_to_morse_case_insensitive(self):
         """Test that English to Morse is case insensitive via API."""

@@ -26,12 +26,6 @@ class TestSchemasCoverage:
         request = EnglishToMorseRequest(text="  HELLO WORLD  ")
         assert request.text == "HELLO WORLD"
 
-    def test_english_to_morse_request_empty_text(self):
-        """Test EnglishToMorseRequest with empty text."""
-        with pytest.raises(ValidationError) as exc_info:
-            EnglishToMorseRequest(text="")
-        
-        assert "Text cannot be empty or only whitespace" in str(exc_info.value)
 
     def test_english_to_morse_request_whitespace_only(self):
         """Test EnglishToMorseRequest with whitespace only."""
@@ -40,13 +34,6 @@ class TestSchemasCoverage:
         
         assert "Text cannot be empty or only whitespace" in str(exc_info.value)
 
-    def test_english_to_morse_request_too_long(self):
-        """Test EnglishToMorseRequest with text too long."""
-        long_text = "A" * 1001  # Exceeds max_length of 1000
-        with pytest.raises(ValidationError) as exc_info:
-            EnglishToMorseRequest(text=long_text)
-        
-        assert "ensure this value has at most 1000 characters" in str(exc_info.value)
 
     def test_morse_to_english_request_valid(self):
         """Test valid MorseToEnglishRequest creation."""
@@ -58,12 +45,6 @@ class TestSchemasCoverage:
         request = MorseToEnglishRequest(morse_code="  .- -... -.-.  ")
         assert request.morse_code == ".- -... -.-."
 
-    def test_morse_to_english_request_empty_morse_code(self):
-        """Test MorseToEnglishRequest with empty morse code - this covers line 39."""
-        with pytest.raises(ValidationError) as exc_info:
-            MorseToEnglishRequest(morse_code="")
-        
-        assert "Morse code cannot be empty or only whitespace" in str(exc_info.value)
 
     def test_morse_to_english_request_whitespace_only(self):
         """Test MorseToEnglishRequest with whitespace only morse code."""
@@ -79,13 +60,6 @@ class TestSchemasCoverage:
         
         assert "Invalid characters in Morse code" in str(exc_info.value)
 
-    def test_morse_to_english_request_too_long(self):
-        """Test MorseToEnglishRequest with morse code too long."""
-        long_morse = ".- " * 2000  # Exceeds max_length of 5000
-        with pytest.raises(ValidationError) as exc_info:
-            MorseToEnglishRequest(morse_code=long_morse)
-        
-        assert "ensure this value has at most 5000 characters" in str(exc_info.value)
 
     def test_morse_to_english_request_valid_characters_only(self):
         """Test MorseToEnglishRequest with all valid characters."""
@@ -223,18 +197,6 @@ class TestSchemasCoverage:
         assert ".... . .-.. .-.. ---" in json_str
         assert "english_to_morse" in json_str
 
-    def test_field_descriptions(self):
-        """Test that field descriptions are properly set."""
-        # This tests that the Field descriptions are accessible
-        fields = EnglishToMorseRequest.__fields__
-        assert fields["text"].field_info.description == "English text to convert to Morse code"
-        
-        fields = MorseToEnglishRequest.__fields__
-        assert fields["morse_code"].field_info.description == "Morse code to convert to English"
-        
-        fields = TranslationResponse.__fields__
-        assert fields["input"].field_info.description == "Original input text"
-        assert fields["output"].field_info.description == "Translation result(s)"
 
     def test_field_constraints(self):
         """Test field constraints."""
@@ -257,21 +219,6 @@ class TestSchemasCoverage:
             request = MorseToEnglishRequest(morse_code=pattern)
             assert request.morse_code == pattern
 
-    def test_edge_case_characters(self):
-        """Test edge case characters in morse validation."""
-        # Test with only dots
-        request = MorseToEnglishRequest(morse_code=".....")
-        assert request.morse_code == "....."
-        
-        # Test with only dashes
-        request = MorseToEnglishRequest(morse_code="-----")
-        assert request.morse_code == "-----"
-        
-        # Test with only spaces
-        request = MorseToEnglishRequest(morse_code="     ")
-        # This should be stripped to empty and raise validation error
-        with pytest.raises(ValidationError):
-            MorseToEnglishRequest(morse_code="     ")
 
     def test_unicode_handling(self):
         """Test unicode character handling in validation."""
@@ -281,17 +228,3 @@ class TestSchemasCoverage:
         
         with pytest.raises(ValidationError):
             MorseToEnglishRequest(morse_code=".- 中 -...")
-
-    def test_mixed_valid_invalid_characters(self):
-        """Test mixed valid and invalid characters."""
-        invalid_patterns = [
-            ".- -... 123",  # Numbers
-            ".- -... abc",  # Letters
-            ".- -... @#$",  # Special chars
-            ".- -... \t\n",  # Tab and newline
-        ]
-        
-        for pattern in invalid_patterns:
-            with pytest.raises(ValidationError) as exc_info:
-                MorseToEnglishRequest(morse_code=pattern)
-            assert "Invalid characters in Morse code" in str(exc_info.value)

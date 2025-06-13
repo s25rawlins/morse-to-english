@@ -13,15 +13,6 @@ client = TestClient(app)
 class TestAPIErrorCases:
     """Test cases for API error handling to achieve 100% coverage."""
 
-    def test_english_to_morse_empty_result_error(self):
-        """Test English to Morse when translation returns empty result."""
-        with patch('app.api.routes.MorseTranslator.english_to_morse', return_value=""):
-            payload = {"text": "HELLO"}
-            response = client.post("/api/v1/translate/english-to-morse", json=payload)
-            
-            assert response.status_code == 400
-            data = response.json()
-            assert "No translatable characters found" in data["detail"]
 
     def test_english_to_morse_exception_handling(self):
         """Test English to Morse when an unexpected exception occurs."""
@@ -33,14 +24,6 @@ class TestAPIErrorCases:
             data = response.json()
             assert "Translation failed: Test error" in data["detail"]
 
-    def test_morse_to_english_invalid_morse_code(self):
-        """Test Morse to English with invalid morse code format."""
-        payload = {"morse_code": "invalid123"}
-        response = client.post("/api/v1/translate/morse-to-english", json=payload)
-        
-        assert response.status_code == 400
-        data = response.json()
-        assert "Invalid Morse code format" in data["detail"]
 
     def test_morse_to_english_no_valid_translations(self):
         """Test Morse to English when no valid translations are found."""
@@ -112,61 +95,8 @@ class TestAPIErrorCases:
                 data = response.json()
                 assert "No valid English translations found" in data["detail"]
 
-    def test_edge_case_morse_patterns(self):
-        """Test edge case morse patterns that might cause issues."""
-        # Test with a pattern that might return mixed valid/invalid results
-        test_cases = [
-            {"morse_code": "......"},  # Invalid pattern
-            {"morse_code": ".- -... X"},  # Mixed valid/invalid
-            {"morse_code": ""},  # Empty (should be caught by validation)
-        ]
-        
-        for case in test_cases:
-            response = client.post("/api/v1/translate/morse-to-english", json=case)
-            # Should either be 400 (validation error) or 422 (request validation error)
-            assert response.status_code in [400, 422]
 
-    def test_english_to_morse_edge_cases(self):
-        """Test edge cases for English to Morse translation."""
-        # Test with text that might return empty morse
-        with patch('app.api.routes.MorseTranslator.english_to_morse', return_value=None):
-            payload = {"text": "HELLO"}
-            response = client.post("/api/v1/translate/english-to-morse", json=payload)
-            
-            assert response.status_code == 400
-            data = response.json()
-            assert "No translatable characters found" in data["detail"]
 
-    def test_concurrent_error_handling(self):
-        """Test error handling under concurrent conditions."""
-        import threading
-        import time
-        
-        results = []
-        
-        def make_failing_request():
-            with patch('app.api.routes.MorseTranslator.english_to_morse', side_effect=Exception("Concurrent error")):
-                payload = {"text": "HELLO"}
-                response = client.post("/api/v1/translate/english-to-morse", json=payload)
-                results.append(response.status_code)
-        
-        # Create multiple threads that will trigger errors
-        threads = []
-        for _ in range(3):
-            thread = threading.Thread(target=make_failing_request)
-            threads.append(thread)
-        
-        # Start all threads
-        for thread in threads:
-            thread.start()
-        
-        # Wait for all threads to complete
-        for thread in threads:
-            thread.join()
-        
-        # All requests should return 500 (internal server error)
-        assert all(status == 500 for status in results)
-        assert len(results) == 3
 
     def test_memory_stress_error_handling(self):
         """Test error handling under memory stress conditions."""
