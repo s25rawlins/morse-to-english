@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Morse Code Translator Web Application Startup Script
-# This script starts both the backend API server and frontend development server
+# Startup script for Morse Code Translator
 
 set -e  # Exit on any error
 

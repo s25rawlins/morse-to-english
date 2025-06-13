@@ -1,6 +1,4 @@
-"""
-Pydantic models for request and response validation.
-"""
+"""Pydantic models for request and response validation."""
 
 from typing import List, Union
 from pydantic import BaseModel, Field, validator

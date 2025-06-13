@@ -1,6 +1,4 @@
-"""
-Nox configuration for automated testing and code quality checks.
-"""
+"""Nox configuration for automated testing and code quality checks."""
 
 import nox
 

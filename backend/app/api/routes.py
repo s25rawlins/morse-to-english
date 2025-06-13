@@ -20,9 +20,7 @@ router = APIRouter()
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
-    """
-    Health check endpoint that returns service status and supported characters.
-    """
+    """Health check endpoint."""
     return HealthResponse(
         status="healthy",
         version="1.0.0",
@@ -32,18 +30,7 @@ async def health_check():
 
 @router.post("/translate/english-to-morse", response_model=TranslationResponse)
 async def translate_english_to_morse(request: EnglishToMorseRequest):
-    """
-    Convert English text to Morse code.
-    
-    Args:
-        request: Request containing English text to translate
-        
-    Returns:
-        Translation response with Morse code result
-        
-    Raises:
-        HTTPException: If translation fails
-    """
+    """Convert English text to Morse code."""
     try:
         morse_result = MorseTranslator.english_to_morse(request.text)
         
@@ -70,21 +57,7 @@ async def translate_english_to_morse(request: EnglishToMorseRequest):
 
 @router.post("/translate/morse-to-english", response_model=TranslationResponse)
 async def translate_morse_to_english(request: MorseToEnglishRequest):
-    """
-    Convert Morse code to English text.
-    
-    This endpoint handles both standard spaced Morse code and ambiguous
-    patterns that may have multiple interpretations.
-    
-    Args:
-        request: Request containing Morse code to translate
-        
-    Returns:
-        Translation response with English result(s)
-        
-    Raises:
-        HTTPException: If translation fails or no valid translations found
-    """
+    """Convert Morse code to English text."""
     try:
         # Validate morse code format
         if not MorseTranslator.validate_morse_code(request.morse_code):
@@ -138,12 +111,7 @@ async def translate_morse_to_english(request: MorseToEnglishRequest):
 
 @router.get("/supported-characters")
 async def get_supported_characters():
-    """
-    Get a list of all characters supported for English to Morse translation.
-    
-    Returns:
-        List of supported characters
-    """
+    """Get supported characters for translation."""
     return {
         "supported_characters": MorseTranslator.get_supported_characters(),
         "total_count": len(MorseTranslator.get_supported_characters())

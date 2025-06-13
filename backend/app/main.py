@@ -1,8 +1,5 @@
 """
 FastAPI application for Morse Code Translator.
-
-This application provides REST API endpoints for translating between
-English text and Morse code, with support for ambiguous translations.
 """
 
 from fastapi import FastAPI, HTTPException

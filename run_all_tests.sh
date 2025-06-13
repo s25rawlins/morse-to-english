@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Comprehensive test runner for Morse Code Translator
-# This script runs all tests for both backend (Python) and frontend (React)
+# Test runner for Morse Code Translator
 
 set -e  # Exit on any error
 

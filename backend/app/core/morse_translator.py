@@ -1,8 +1,5 @@
 """
 Morse Code Translation Module
-
-This module provides functionality to translate between English text and Morse code,
-including handling of ambiguous Morse code patterns that can have multiple interpretations.
 """
 
 from typing import List, Dict

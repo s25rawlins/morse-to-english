@@ -12,7 +12,6 @@ const MorseTranslator = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Use useRef for debounce timer to avoid unnecessary re-renders
   const debounceTimerRef = useRef(null);
 
   const clearMessages = useCallback(() => {
@@ -57,7 +56,7 @@ const MorseTranslator = () => {
     }
   }, [input, mode, clearMessages]);
 
-  // Auto-translate with debouncing - optimized to prevent re-renders
+  // Auto-translate with debouncing
   useEffect(() => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -67,13 +66,11 @@ const MorseTranslator = () => {
       const timer = setTimeout(async () => {
         if (!input.trim()) return;
 
-        // Batch state updates to minimize re-renders
         try {
           let result;
           
           if (mode === 'english-to-morse') {
             result = await translateEnglishToMorse(input);
-            // Use functional updates to avoid dependency issues
             setOutput(result.output);
             setError('');
             setSuccess('');
@@ -114,7 +111,7 @@ const MorseTranslator = () => {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [input, mode]); // Minimal dependencies
+  }, [input, mode]);
 
   const handleModeChange = (newMode) => {
     // If there's existing output and we're changing modes, use the output as new input
@@ -156,7 +153,6 @@ const MorseTranslator = () => {
       const newMode = mode === 'english-to-morse' ? 'morse-to-english' : 'english-to-morse';
       setMode(newMode);
       setInput(outputText);
-      // Don't clear output immediately - let the auto-translate handle it
       clearMessages();
     }
   };
