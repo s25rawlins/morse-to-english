@@ -41,8 +41,9 @@ class MorseTranslator:
         """
         if not english_text:
             return ""
-            
-        english_text = english_text.upper().strip()
+        
+        # Don't strip whitespace - preserve it for proper translation
+        english_text = english_text.upper()
         morse_result = []
         
         for char in english_text:
@@ -105,8 +106,24 @@ class MorseTranslator:
         
         all_translations = []
         
-        # Try different combinations of morse units
-        for end_index in range(index + 1, len(morse_units) + 1):
+        # First try single morse unit
+        current_unit = morse_units[index]
+        if current_unit in cls.REVERSE_MORSE_DICT:
+            letter = cls.REVERSE_MORSE_DICT[current_unit]
+            
+            if letter == ' ':
+                new_translation = current_translation + ' '
+            else:
+                new_translation = current_translation + letter
+            
+            remaining_translations = cls._find_all_translations(
+                morse_units, index + 1, new_translation
+            )
+            
+            all_translations.extend(remaining_translations)
+        
+        # Then try combinations of morse units for ambiguous patterns
+        for end_index in range(index + 2, len(morse_units) + 1):
             potential_pattern = ' '.join(morse_units[index:end_index])
             
             if potential_pattern in cls.REVERSE_MORSE_DICT:

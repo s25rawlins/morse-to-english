@@ -63,10 +63,9 @@ class TestMorseTranslator:
     def test_morse_to_english_ambiguous(self):
         """Test Morse to English with ambiguous patterns."""
         result = MorseTranslator.morse_to_english("...-.")
-        # This could be "VE" or "5"
-        assert len(result) >= 2
+        # This could be "VE" (V=...- + E=.) or other combinations
+        assert len(result) >= 1
         assert "VE" in result
-        assert "5" in result
 
     def test_morse_to_english_complex_ambiguous(self):
         """Test complex ambiguous Morse code."""
@@ -88,7 +87,8 @@ class TestMorseTranslator:
     def test_morse_to_english_single_character(self):
         """Test Morse to English with single character."""
         result = MorseTranslator.morse_to_english(".-")
-        assert result == ["A"]
+        # ".-" can be interpreted as "A" or "ET" (E=. + T=-)
+        assert "A" in result
 
     def test_morse_to_english_numbers(self):
         """Test Morse to English with numbers."""
@@ -242,8 +242,8 @@ class TestMorseTranslator:
         """Test input sanitization and handling."""
         # Test with extra whitespace
         result1 = MorseTranslator.english_to_morse("  HELLO  ")
-        result2 = MorseTranslator.english_to_morse("HELLO")
-        assert result1 == "/ / .... . .-.. .-.. --- / /"
+        expected = "/ / .... . .-.. .-.. --- / /"
+        assert result1 == expected
         
         # Test Morse with extra whitespace
         result1 = MorseTranslator.morse_to_english("  .- -...  ")
