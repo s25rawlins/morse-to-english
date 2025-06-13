@@ -117,10 +117,19 @@ const MorseTranslator = () => {
   }, [input, mode]); // Minimal dependencies
 
   const handleModeChange = (newMode) => {
-    setMode(newMode);
-    setInput('');
-    setOutput('');
-    clearMessages();
+    // If there's existing output and we're changing modes, use the output as new input
+    const outputText = Array.isArray(output) ? output[0] : output;
+    if (outputText && typeof outputText === 'string' && outputText.trim() && newMode !== mode) {
+      setMode(newMode);
+      setInput(outputText);
+      clearMessages();
+    } else {
+      // Normal mode change behavior when no output or same mode
+      setMode(newMode);
+      setInput('');
+      setOutput('');
+      clearMessages();
+    }
   };
 
   const handleInputChange = (value) => {
@@ -134,11 +143,20 @@ const MorseTranslator = () => {
   };
 
   const handleSwap = () => {
+    let outputText = '';
+    
+    // Handle both string and array outputs
     if (typeof output === 'string' && output.trim()) {
+      outputText = output;
+    } else if (Array.isArray(output) && output.length > 0 && output[0] && output[0].trim()) {
+      outputText = output[0]; // Use the first interpretation
+    }
+    
+    if (outputText) {
       const newMode = mode === 'english-to-morse' ? 'morse-to-english' : 'english-to-morse';
       setMode(newMode);
-      setInput(output);
-      setOutput('');
+      setInput(outputText);
+      // Don't clear output immediately - let the auto-translate handle it
       clearMessages();
     }
   };
@@ -175,6 +193,9 @@ const MorseTranslator = () => {
           className={`mode-button ${mode === 'english-to-morse' ? 'active' : ''}`}
           onClick={() => handleModeChange('english-to-morse')}
           disabled={isLoading}
+          title={(typeof output === 'string' && output.trim()) || (Array.isArray(output) && output[0] && output[0].trim()) ? 
+            (mode !== 'english-to-morse' ? "Switch to English → Morse and translate current output" : "Switch to English → Morse mode") :
+            "Switch to English → Morse mode"}
         >
           English → Morse
         </button>
@@ -182,6 +203,9 @@ const MorseTranslator = () => {
           className={`mode-button ${mode === 'morse-to-english' ? 'active' : ''}`}
           onClick={() => handleModeChange('morse-to-english')}
           disabled={isLoading}
+          title={(typeof output === 'string' && output.trim()) || (Array.isArray(output) && output[0] && output[0].trim()) ? 
+            (mode !== 'morse-to-english' ? "Switch to Morse → English and translate current output" : "Switch to Morse → English mode") :
+            "Switch to Morse → English mode"}
         >
           Morse → English
         </button>
@@ -231,10 +255,10 @@ const MorseTranslator = () => {
         <button
           className="btn btn-secondary"
           onClick={handleSwap}
-          disabled={!output || Array.isArray(output) || isLoading}
-          title="Swap input and output"
+          disabled={!output || (Array.isArray(output) && (!output[0] || !output[0].trim())) || (typeof output === 'string' && !output.trim()) || isLoading}
+          title="Swap input and output, then translate in reverse direction"
         >
-          Swap
+          ⇄ Swap
         </button>
         
         <button

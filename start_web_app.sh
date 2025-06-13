@@ -86,10 +86,9 @@ echo "Backend dependencies installed"
 
 # Start backend server
 echo "Starting backend server..."
-cd app
-python3 main.py &
+python3 -m app.main &
 BACKEND_PID=$!
-cd ../..
+cd ..
 
 # Wait a moment for backend to start
 sleep 3
